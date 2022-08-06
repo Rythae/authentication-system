@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const { requestPasswordReset,resetPassword } = require("../Utils/auth");
 
 dotenv.config();
 
@@ -31,7 +32,8 @@ const register = async (req,res,next) => {
             });
             res.status(201).json({
               message: "User successfully created",
-              user: user._id,
+              user,
+              token
             });
           })
           .catch((error) =>
@@ -82,7 +84,8 @@ const login = async (req, res, next) => {
            });
            res.status(201).json({
              message: "User successfully Logged in",
-             user: user._id,
+             user,
+             token
            });
          } else {
            res.status(400).json({ message: "Login not succesful" });
@@ -146,6 +149,25 @@ const deleteUser = async (req, res, next) => {
 };
 
 
+
+
+const resetPasswordRequestController = async (req, res, next) => {
+  const requestPasswordResetService = await requestPasswordReset(
+    req.body.email
+  );
+  return res.json(requestPasswordResetService);
+};
+
+const resetPasswordController = async (req, res, next) => {
+  const resetPasswordService = await resetPassword(
+    req.body.userId,
+    req.body.token,
+    req.body.password
+  );
+  return res.json(resetPasswordService);
+};
+
+
 const logout = async (req, res, next) => {
   const { id } = req.body;
   console.log("User Id", id);
@@ -176,4 +198,12 @@ const logout = async (req, res, next) => {
 
 
 
-module.exports = { register, login, update, deleteUser, logout };
+module.exports = {
+  register,
+  login,
+  update,
+  deleteUser,
+  resetPasswordRequestController,
+  resetPasswordController,
+  logout,
+};
