@@ -14,15 +14,12 @@ const sendEmail = async (email, subject, payload) => {
       },
     });
 
-    // const source = fs.readFileSync(path.join(__dirname, template), "utf8");
-    // const compiledTemplate = handlebars.compile(source);
     const mailOptions = () => {
       return {
         from: process.env.FROM_EMAIL,
         to: process.env.FROM_EMAIL,
         subject: "reset password",
         text: "Use the link to reset your password",
-        // html: compiledTemplate(payload),
       };
     };
 

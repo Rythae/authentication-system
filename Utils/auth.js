@@ -34,7 +34,6 @@ const requestPasswordReset = async (email) => {
       name: user.name,
       link: link,
     },
-    "./template/requestResetPassword.handlebars"
   );
   return link;
 };
@@ -68,7 +67,6 @@ const resetPassword = async (userId, token, password) => {
     {
       name: user.name,
     },
-    "./template/resetPassword.handlebars"
   );
 
   await passwordResetToken.deleteOne();
