@@ -10,7 +10,7 @@ const adminAuth = (req, res, next) => {
       if (err) {
         return res.status(401).json({ message: "Not authorized" });
       } else {
-        if (decodedToken.role !== "admin") {
+        if ((decodedToken.role !== "admin" || decodedToken.role !== "staff" || decodedToken.role !== "manager")) {
           return res.status(401).json({ message: "Not authorized" });
         } else {
           next();
@@ -32,7 +32,7 @@ const userAuth = (req, res, next) => {
       if (err) {
         return res.status(401).json({ message: "Not authorized" });
       } else {
-        if (decodedToken.role !== "Basic") {
+        if (decodedToken.role !== "staff") {
           return res.status(401).json({ message: "Not authorized" });
         } else {
           next();

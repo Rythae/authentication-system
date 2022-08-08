@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 app.use("/", routes);
 app.get("/admin", adminAuth, (req, res) => res.send("Admin Route"));
-app.get("/basic", userAuth, (req, res) => res.send("User Route"));
+app.get("/staff", userAuth, (req, res) => res.send("User Route"));
 
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to authentication module system." });

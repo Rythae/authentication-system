@@ -109,8 +109,8 @@ const update = async (req, res, next) => {
       // Finds the user with the id
       await User.findById(id)
         .then((user) => {
-          // Third - Verifies the user is not an admin
-          if (user.role !== "admin") {
+          // Third - Verifies the user is not an admin, staff or a manager
+          if (user.role !== "admin" || user.role !== "staff" || user.role !== "manager") {
             user.role = role;
             user.save((err) => {
               //Monogodb error checker
