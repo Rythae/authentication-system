@@ -148,9 +148,6 @@ const deleteUser = async (req, res, next) => {
     );
 };
 
-
-
-
 const resetPasswordRequestController = async (req, res, next) => {
   const requestPasswordResetService = await requestPasswordReset(
     req.body.email
@@ -168,33 +165,40 @@ const resetPasswordController = async (req, res, next) => {
 };
 
 
-const logout = async (req, res, next) => {
-  const { id } = req.body;
-  console.log("User Id", id);
-  const user = await User.findByIdAndRemove(id);
-    if (!user) {
-        res.status(400).json({
-        message: "Logout not successful",
-        error: "User not found",
-        });
-    } else {
-     const maxAge = 3 * 60 * 60;
-     const token = jwt.sign(
-       { id: user._id },
-       process.env.JWT_SECRET,
-       {
-         expiresIn: maxAge, // 3hrs in sec
-       }
-     );
-     res.cookie("jwt", token, {
-       httpOnly: true,
-       maxAge: 0
-     });
-     res.json({
-       message: "User successfully Logged out",
-     });
-    }
-};
+const logout = async (req, res) => {
+  const cookies = req.cookies;
+  if (!cookies?.jwt)
+    return res.status(204).json({
+    message: "Logout not successful",
+    error: "User not found",
+    }); // No content
+  
+  const token = cookies.jwt;
+
+  //Is token in db?
+  const foundUser = await User.find((user) => user.token === token);
+  if (!foundUser) {
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
+    res.status(204).json({
+      message: "Logout not successful",
+      error: "User not found",
+    });
+  }
+  // Delete token in db
+  const otherUsers = User.filter((user) => user.token !== foundUser.token);
+  const currentUser = { ...foundUser, token: "" };
+  User.setUsers([...otherUsers, currentUser]);
+
+  res.clearCookie("jwt", { httpOnly: true, sameSite: "None", secure: true });
+  res.status(204).json({
+    message: "Logout not successful",
+    error: "User not found",
+  });
+}
 
 
 
