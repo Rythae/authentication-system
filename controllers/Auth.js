@@ -1,7 +1,9 @@
-const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const db = require("../models");
+const User = db.user;
+const Role = db.role;
 const { requestPasswordReset,resetPassword } = require("../Utils/auth");
 
 dotenv.config();
@@ -20,7 +22,7 @@ const register = async (req,res,next) => {
           .then((user) => {
             const maxAge = 3 * 60 * 60;
             const token = jwt.sign(
-              { id: user._id, username, role: user.role },
+              { id: user._id, username, },
               process.env.JWT_SECRET,
               {
                 expiresIn: maxAge, // 3hrs in sec
@@ -30,6 +32,42 @@ const register = async (req,res,next) => {
               httpOnly: true,
               maxAge: maxAge * 1000, // 3hrs in ms
             });
+            if (req.body.roles) {
+              Role.find(
+                {
+                  name: { $in: req.body.roles }
+                },
+                (err, roles) => {
+                  if (err) {
+                    res.status(500).send({ message: err });
+                    return;
+                  }
+                  user.roles = roles.map(role => role._id);
+                  user.save(err => {
+                    if (err) {
+                      res.status(500).send({ message: err });
+                      return;
+                    }
+                    res.send({ message: "User was registered successfully!" });
+                  });
+                }
+              );
+            } else {
+              Role.findOne({ name: "user" }, (err, role) => {
+                if (err) {
+                  res.status(500).send({ message: err });
+                  return;
+                }
+                user.roles = [role._id];
+                user.save(err => {
+                  if (err) {
+                    res.status(500).send({ message: err });
+                    return;
+                  }
+                  res.send({ message: "User was registered successfully!" });
+                });
+              });
+            }
             res.status(201).json({
               message: "User successfully created",
               user,
@@ -60,7 +98,7 @@ const login = async (req, res, next) => {
    });
  }
  try {
-   const user = await User.findOne({ username });
+   const user = await User.findOne({ username }).populate("roles", "-__v");
    if (!user) {
      res.status(400).json({
        message: "Login not successful",
@@ -72,7 +110,7 @@ const login = async (req, res, next) => {
          if (result) {
            const maxAge = 3 * 60 * 60;
            const token = jwt.sign(
-             { id: user._id, username, role: user.role },
+             { id: user._id, username, roles: user.roles },
              process.env.JWT_SECRET,
              {
                expiresIn: maxAge, // 3hrs in sec
@@ -82,10 +120,15 @@ const login = async (req, res, next) => {
              httpOnly: true,
              maxAge: maxAge * 1000, // 3hrs in ms
            });
+            const authorities = [];
+            for (let i = 0; i < user.roles.length; i++) {
+              authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
+            }
            res.status(201).json({
              message: "User successfully Logged in",
              user,
-             token
+             token,
+             roles: authorities,
            });
          } else {
            res.status(400).json({ message: "Login not succesful" });

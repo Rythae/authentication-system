@@ -10,12 +10,12 @@ const UserSchema = new Mongoose.Schema({
     minlength: 6,
     required: true,
   },
-  role: {
-    type: String,
-    enum: ['admin', 'staff', 'manager'],
-    default: "staff",
-    required: true,
-  },
+  roles: [
+    {
+      type: Mongoose.Schema.Types.ObjectId,
+      ref: "Role"
+    },
+  ],
 });
 
 const User = Mongoose.model("user", UserSchema);
