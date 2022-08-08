@@ -104,8 +104,8 @@ const update = async (req, res, next) => {
   const { role, id } = req.body;
   // First - Verifying if role and id is presnt
   if (role && id) {
-    // Second - Verifying if the value of role is admin
-    if (role === "admin") {
+    // Second - Verifying if the value of role is admin,staff,manager
+    if (role === "admin" || role === "staff" || role === "manager") {
       // Finds the user with the id
       await User.findById(id)
         .then((user) => {
