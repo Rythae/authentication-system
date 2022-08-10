@@ -31,7 +31,7 @@ const requestPasswordReset = async (email) => {
     user.email,
     "Password Reset Request",
     {
-      name: user.name,
+      name: user.username,
       link: link,
     },
   );
@@ -65,7 +65,7 @@ const resetPassword = async (userId, token, password) => {
     user.email,
     "Password Reset Successfully",
     {
-      name: user.name,
+      name: user.username,
     },
   );
 

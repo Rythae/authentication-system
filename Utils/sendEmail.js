@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 // const fs = require("fs");
 // const path = require("path");
 
-const sendEmail = async (email, subject, payload) => {
+const sendEmail = async (email, subject, text) => {
   try {
     // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
@@ -17,9 +17,9 @@ const sendEmail = async (email, subject, payload) => {
     const mailOptions = () => {
       return {
         from: process.env.FROM_EMAIL,
-        to: process.env.FROM_EMAIL,
-        subject: "reset password",
-        text: "Use the link to reset your password",
+        to: email,
+        subject: subject,
+        text: "text",
       };
     };
 
