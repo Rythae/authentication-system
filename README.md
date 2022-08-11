@@ -1,6 +1,6 @@
 ## authentication-system
 
-- This is an authentication-module app that allows a user to register, login, logout and reset their password. It also allows one to add roles for different users such as admin, staff and a manager. 
+- This is an authentication-module app that allows users to register, login, logout and reset their password. It also allows one to add roles for different users such as admin, staff and a manager. 
 
 ###  The screenshots below displays the working endpoints for all the routes
 
