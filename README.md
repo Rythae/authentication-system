@@ -23,5 +23,5 @@
 
 <img src="https://github.com/Rythae/authentication-system/blob/main/images/USER%20REGISTERRRRRRRRRRRR%20.png" alt="Alt text">
 
-<img src="" alt="Alt text">
+<img src="https://github.com/Rythae/authentication-system/blob/main/images/REQUEST%20RESET%20PASSWORDDDDD.png" alt="Alt text">
 
