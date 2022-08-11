@@ -16,7 +16,7 @@ router.post("/login", login);
 router.post("/requestResetPassword", resetPasswordRequestController);
 router.post("/passwordReset", resetPasswordController);
 router.delete("/delete/:id", verifyUser, verifyAuth.isAdmin, deleteUser);
-router.get("/admin-profile", verifyUser, verifyAuth.isAdmin, adminProfile);
+router.get("/admin-profile", verifyUser, verifyAuth.isStaff, adminProfile);
 router.post("/logout", logout);
 
 
