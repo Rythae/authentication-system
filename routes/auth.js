@@ -7,18 +7,17 @@ const {
   deleteUser,
   resetPasswordRequestController,
   resetPasswordController,
+  adminProfile,
 } = require("../controllers/Auth");
-const {
-  userAuth,
-  verifyAuth,
-} = require("../middleware/auth");
+const { userAuth, verifyAuth, verifyUser} = require("../middleware/auth");
 
 router.post("/register", register);
-router.post("/login", userAuth, login);
+router.post("/login", login);
 router.post("/requestResetPassword", resetPasswordRequestController);
-router.post("/resetPassword", resetPasswordController);
-router.delete("/delete",verifyAuth.isAdmin, deleteUser);
-router.get("/logout", logout);
+router.post("/passwordReset", resetPasswordController);
+router.delete("/delete/:id", verifyUser, verifyAuth.isAdmin, deleteUser);
+router.get("/admin-profile", verifyUser, verifyAuth.isAdmin, adminProfile);
+router.post("/logout", logout);
 
 
 

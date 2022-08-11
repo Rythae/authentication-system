@@ -16,7 +16,7 @@ const register = async (req,res,next) => {
     const newUser = await User.create({
       username,
       password: hashPassword,
-      email
+      email,
     })
      const maxAge = 3 * 60 * 60;
      const token = jwt.sign(
@@ -92,35 +92,39 @@ const login = async (req, res, next) => {
 
 
 const logout = async (req, res) => {
-  const token = req.cookies.jwt;
-  if (!token)
-    return res.status(204).json({
-    message: "Logout not successful",
-    error: "User not found",
-    }); // No content
-  
-  if (token) {
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-      maxAge: 0
-    });
-    res.status(200).json({
-      message: "Logout successful",
-      token
-    });
-  }
+  res.cookie("jwt", "", {
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+    maxAge: 0,
+  });
+  res.status(200).json({
+    message: "Logout successful",
+  });
 }
 
 
-const deleteUser =  (req, res, next) => {
-  const { id } = req.body;
-  const { deletedCount } = await User.deleteOne({ _id: id });
-  return deletedCount
-    ? res.status(200).json({ message: "User successfully deleted" })
-    : res.status(400).json({ message: "No User found" });
+const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { deletedCount } = await User.deleteOne({ _id: id });
+    return deletedCount
+      ? res.status(200).json({ message: "User successfully deleted" })
+      : res.status(400).json({ message: "No User found" });
+  } catch (error) {
+    res.status(500).json({
+      message: "An error occurred",
+      error: error.message,
+    });
+  }
 };
+
+const adminProfile = (req, res, next) => {
+   return res.status(200).json({
+     message: "Profile successfully Fetched",
+     user: req.user,
+   });
+}
 
 const resetPasswordRequestController = async (req, res, next) => {
   const requestPasswordResetService = await requestPasswordReset(
@@ -131,11 +135,16 @@ const resetPasswordRequestController = async (req, res, next) => {
 
 const resetPasswordController = async (req, res, next) => {
   const resetPasswordService = await resetPassword(
-    req.body.userId,
+    // req.body.userId,
     req.body.token,
     req.body.password
   );
-  return res.json(resetPasswordService);
+  return resetPasswordService
+    ? res.json({ message: "Password reser successful" })
+    : res.status(500).json({
+        message: "An error occurred",
+        error: error.message,
+      });
 };
 
 module.exports = {
@@ -145,4 +154,5 @@ module.exports = {
   resetPasswordRequestController,
   resetPasswordController,
   logout,
+  adminProfile,
 };

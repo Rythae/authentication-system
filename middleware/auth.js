@@ -35,60 +35,52 @@ const userAuth = (req, res, next) => {
 //   });
 // };
 
-const isAdmin = async (req, res, next) => {
+const verifyUser = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
     const verify = await jwt.verify(token, process.env.JWT_SECRET);
-    if (verify.role !== "admin") {
-      return res.status(401).json({ message: "Not authorized" });
-    }
+    req.user = verify;
     return next();
-  }
-  catch (error) {
+  } catch (error) {
     return res.status(401).json({
       message: "Sorry you're not authorized to execute this action",
       error: error.message,
     });
   }
+}
+
+const isAdmin = async (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(401).json({
+      message: "Sorry you're not authorized to execute this action",
+      error: "Access denied!"
+    });
+  }
+  return next();
 };
 
 const isStaff = async (req, res, next) => {
-  try {
-    const token = req.cookies.jwt;
-    const verify = await jwt.verify(token, process.env.JWT_SECRET);
-    if (verify.role !== "staff") {
-      return res.status(401).json({ message: "Not authorized" });
-    }
-    return next();
-  } catch (error) {
-    return res.status(401).json({
-      message: "Sorry you're not authorized to execute this action",
-      error: error.message,
-    });
-  }
+  return req.user.role === "staff"
+    ? next()
+    : res.status(401).json({
+        message: "Sorry you're not authorized to execute this action",
+        error: "Access denied!",
+      });
 };
-
 
 const isManager = async (req, res, next) => {
-  try {
-    const token = req.cookies.jwt;
-    const verify = await jwt.verify(token, process.env.JWT_SECRET);
-    if (verify.role !== "manager") {
-      return res.status(401).json({ message: "Not authorized" });
-    }
-    return next();
-  } catch (error) {
-    return res.status(401).json({
-      message: "Sorry you're not authorized to execute this action",
-      error: error.message,
-    });
-  }
+  return req.user.role === "manager"
+    ? next()
+    : res.status(401).json({
+        message: "Sorry you're not authorized to execute this action",
+        error: "Access denied!",
+      });
 };
+
 const verifyAuth = {
   isAdmin,
   isStaff,
   isManager,
 };
 
-
-module.exports = { userAuth, verifyAuth };
+module.exports = { userAuth, verifyUser, verifyAuth };

@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 // const fs = require("fs");
 // const path = require("path");
 
-const sendEmail = async (email, subject, text) => {
+const sendEmail = async (email, subject, linkDetails) => {
   try {
     // create reusable transporter object using the default SMTP transport
     const transporter = nodemailer.createTransport({
@@ -14,18 +14,17 @@ const sendEmail = async (email, subject, text) => {
       },
     });
 
-    const mailOptions = () => {
-      return {
+    const mailOptions = {
         from: process.env.FROM_EMAIL,
         to: email,
         subject: subject,
-        text: "text",
-      };
+        text: linkDetails.link,
     };
 
     // Send email
-    transporter.sendMail(mailOptions(), (error, info) => {
+    transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.log(error)
         return error;
       } else {
         return res.status(200).json({
@@ -34,6 +33,7 @@ const sendEmail = async (email, subject, text) => {
       }
     });
   } catch (error) {
+     console.log(error);
     return error;
   }
 };

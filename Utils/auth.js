@@ -38,24 +38,24 @@ const requestPasswordReset = async (email) => {
   return link;
 };
 
-const resetPassword = async (userId, token, password) => {
-  let passwordResetToken = await Token.findOne({ userId });
+const resetPassword = async (token, password) => {
+  let passwordResetToken = await Token.findOne({ token }).exec();
 
   if (!passwordResetToken) {
     throw new Error("Invalid or expired password reset token");
   }
 
-  const isValid = await bcrypt.compare(token, passwordResetToken.token);
+  // const isValid = await bcrypt.compare(token, passwordResetToken.token);
 
-  if (!isValid) {
-    throw new Error("Invalid or expired password reset token");
-  }
-
-  const hash = await bcrypt.hash(password, Number(bcryptSalt));
+  // if (!isValid) {
+  //   throw new Error("Invalid or expired password reset token");
+  // }
+  // const hash = await bcrypt.hash(password, Number(bcryptSalt));
+  const hashPassword = await bcrypt.hash(password, 10)
 
   await User.updateOne(
-    { _id: userId },
-    { $set: { password: hash } },
+    { _id: passwordResetToken.userId },
+    { $set: { password: hashPassword } },
     { new: true }
   );
 
@@ -65,7 +65,7 @@ const resetPassword = async (userId, token, password) => {
     user.email,
     "Password Reset Successfully",
     {
-      name: user.username,
+      link: user.username,
     },
   );
 
