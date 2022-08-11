@@ -17,7 +17,6 @@ const register = async (req,res,next) => {
       username,
       password: hashPassword,
       email,
-      role: "manager"
     })
      const maxAge = 3 * 60 * 60;
      const token = jwt.sign(
